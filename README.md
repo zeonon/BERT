@@ -1,9 +1,30 @@
-## BERT-Tutorial
+# BERT-Tutorial
 
-### data file
+### About the Dataset
 bert 코드를 실행하기에 앞서 **.csv 형식**의 데이터 파일을 준비해야 합니다.
 
 [csv파일예시]( )
+
+카테고리는 **text**와 BIO tagging의 결과물인 **labels** 두 가지입니다.
+
+Bi-LSTM에서 사용한 dataset과는 다르게 text가 토큰화 되지 않은 상태이며, label 또한 띄어쓰기만 된 상태로 한 칸에 모두 작성되었습니다. 
+
+[BIO tagging 목록]
+
+*O : assigned if a word doesn’t belong to any entity.
+
+*B-AN/I-AN : Anode
+
+*B-CP/I-CP : Capacity
+
+*B-CY-I-CY : Cycle
+
+*B-CD/I-CD : Current Density
+
+*B-CA/I-CA : Cathode
+
+(B: Beginnig / I:   Intermediate)
+
 
 
 ```python 
@@ -20,7 +41,11 @@ df = pd.read_csv('bert_600.csv')
 df.head()
 ```
 
-### data file 속 label
+
+
+
+##Data Preprocessing 
+
 ```
 # Split labels based on whitespace and turn them into a list
 labels = [i.split() for i in df['labels'].values.tolist()]
@@ -38,17 +63,19 @@ print(unique_labels)
 labels_to_ids = {k: v for v, k in enumerate(sorted(unique_labels))}
 ids_to_labels = {v: k for v, k in enumerate(sorted(unique_labels))}
 print(labels_to_ids)
+```
 
 
+
+###Tokenization
+```
 # Let's take a look at how can we preprocess the text - Take first example
 text = df['text'].values.tolist()
 
 example = text[5]
 print(example)
-```
 
-### 토큰화
-```
+
 tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
 text_tokenized = tokenizer(example, padding='max_length', max_length=512, truncation=True, return_tensors="pt")
 
@@ -56,7 +83,10 @@ text_tokenized = tokenizer(example, padding='max_length', max_length=512, trunca
 #print(text_tokenized)
 
 #print(tokenizer.decode(text_tokenized.input_ids[0]))
+```
 
+### Adjusting Label After Tokenization
+```
 #print(tokenizer.convert_ids_to_tokens(text_tokenized["input_ids"][0]))
 
 word_ids = text_tokenized.word_ids()
@@ -109,7 +139,7 @@ new_label = align_label_example(text_tokenized, label)
 #print(tokenizer.convert_ids_to_tokens(text_tokenized["input_ids"][0]))
 ```
 
-### 음
+### Dataset Class
 ```
 def align_label(texts, labels):
     tokenized_inputs = tokenizer(texts, padding='max_length', max_length=512, truncation=True)
