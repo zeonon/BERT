@@ -5,9 +5,18 @@ bert 코드를 실행하기에 앞서 **.csv 형식**의 데이터 파일을 준
 
 [csv파일예시]( )
 
+
+
+
 카테고리는 **text**와 BIO tagging의 결과물인 **labels** 두 가지입니다.
 
 Bi-LSTM에서 사용한 dataset과는 다르게 text가 토큰화 되지 않은 상태이며, label 또한 띄어쓰기만 된 상태로 한 칸에 모두 작성되었습니다. 
+
+
+
+
+
+
 
 [BIO tagging 목록]
 
@@ -24,6 +33,12 @@ Bi-LSTM에서 사용한 dataset과는 다르게 text가 토큰화 되지 않은 
 *B-CA/I-CA : Cathode
 
 (B: Beginnig / I:   Intermediate)
+
+
+
+
+
+
 
 
 
@@ -204,9 +219,12 @@ class DataSequence(torch.utils.data.Dataset):
 df = df[0:1000]
 df_train, df_val, df_test = np.split(df.sample(frac=1, random_state=42),
                             [int(.8 * len(df)), int(.9 * len(df))])
+```
 
 
 
+### Model Building
+```
 class BertModel(torch.nn.Module):
 
     def __init__(self):
@@ -220,10 +238,11 @@ class BertModel(torch.nn.Module):
         output = self.bert(input_ids=input_id, attention_mask=mask, labels=label, return_dict=False)
 
         return output
+```
 
 
-
-
+### Training Loop
+```
 def train_loop(model, df_train, df_val):
 
     train_dataset = DataSequence(df_train)
@@ -307,18 +326,21 @@ def train_loop(model, df_train, df_val):
 
         print(
             f'Epochs: {epoch_num + 1} | Loss: {total_loss_train / len(df_train): .3f} | Accuracy: {total_acc_train / len(df_train): .3f} | Val_Loss: {total_loss_val / len(df_val): .3f} | Accuracy: {total_acc_val / len(df_val): .3f}')
-```
 
-### test data
-```
+
+
 LEARNING_RATE = 5e-3
 EPOCHS = 5
 BATCH_SIZE = 2
 
 model = BertModel()
 train_loop(model, df_train, df_val)
+```
 
 
+
+### Evaluate Model on Test Data
+```
 def evaluate(model, df_test):
 
     test_dataset = DataSequence(df_test)
@@ -413,7 +435,7 @@ def evaluate_one_text(model, sentence):
 ```
 
 
-#### test data 입력 
+### test data 입력 
 ```
 evaluate_one_text(model, 'Through mixing with single-walled carbon nanotubes, the prepared composite anode material Cobtbpy-0.9 achieved a high reversible capability, delivering 416 mAh/g in the potassium-ion batteries and 379 mAh/g in the sodium-ion batteries at 0.05 A/g.' )
 ```
