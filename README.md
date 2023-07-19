@@ -67,7 +67,7 @@ print(labels_to_ids)
 
 
 
-###Tokenization
+### Tokenization
 ```
 # Let's take a look at how can we preprocess the text - Take first example
 text = df['text'].values.tolist()
